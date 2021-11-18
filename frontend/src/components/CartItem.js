@@ -2,7 +2,7 @@ import React from 'react'
 import { Row, Col, ListGroup, Form, Button, Card, Image } from 'react-bootstrap'
 import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
-
+import { useSelector } from 'react-redux'
 import Message from '../components/Message'
 import { addToCart, removeFromCart } from '../actions/cartActions'
 
@@ -13,8 +13,16 @@ const CartItem = ({ cartItems }) => {
   const removeFromCartHandeler = (id) => {
     dispatch(removeFromCart(id))
   }
+
+  const userLogin = useSelector((state) => state.userLogin)
+  const { userInfo } = userLogin
   const checkOutHandeler = () => {
-    navigate('/login?redirect=shipping')
+    if (userInfo) {
+      // navigate('/login?redirect=shipping')
+      navigate('/shipping')
+    } else {
+      navigate('/login')
+    }
   }
 
   return (

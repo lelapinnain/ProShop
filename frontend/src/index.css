@@ -22,3 +22,7 @@ h2 {
   padding: 1rem;
   text-decoration: 'none';
 }
+
+.red {
+  color: red;
+}

@@ -14,7 +14,10 @@ import {
   USER_UPDATE_PROFILE_FAIL,
   USER_UPDATE_PROFILE_REQUEST,
   USER_UPDATE_PROFILE_SUCCESS,
+  USER_DETAILS_RESET,
 } from '../constants/userConstants'
+import { ORDER_LIST_MY_RESET } from '../constants/orderConstants'
+import { CART_RESET_ITEMS } from '../constants/cartConstants'
 
 export const login = (email, password) => async (dispatch) => {
   try {
@@ -51,7 +54,14 @@ export const login = (email, password) => async (dispatch) => {
 
 export const logout = () => (dispatch) => {
   localStorage.removeItem('userInfo')
+  localStorage.removeItem('cartItems')
+  localStorage.removeItem('shippingAddress')
+  localStorage.removeItem('PaymentMethod')
+
   dispatch({ type: USER_LOGOUT })
+  dispatch({ type: ORDER_LIST_MY_RESET })
+  dispatch({ type: USER_DETAILS_RESET })
+  dispatch({ type: CART_RESET_ITEMS })
 }
 
 export const register = (name, email, password) => async (dispatch) => {
@@ -139,7 +149,7 @@ export const updateUser = (user) => async (dispatch, getState) => {
         Authorization: `Bearer ${userInfo.token}`,
       },
     }
-    console.log(user)
+
     const { data } = await axios.put('/api/users/profile', user, config)
 
     dispatch({
