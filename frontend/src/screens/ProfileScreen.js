@@ -35,6 +35,11 @@ const ProfileScreen = () => {
   //console.log(orders)
 
   useEffect(() => {
+    //to check if the state is full of admin user update data
+    if (user._id !== userInfo._id) {
+      dispatch(getUserDetails('profile'))
+      dispatch(listMyOrders())
+    }
     if (!userInfo) {
       navigate('/login')
     } else {

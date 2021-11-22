@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import { PayPalButton } from 'react-paypal-button-v2'
 import axios from 'axios'
 
@@ -15,6 +15,7 @@ const OrderScreen = () => {
   const [sdkReady, setSdkReady] = useState(false)
   const dispatch = useDispatch()
   const match = useParams()
+  const navigate = useNavigate()
   const orderId = match.id
 
   const orderDetails = useSelector((state) => state.orderDetails)
@@ -24,6 +25,9 @@ const OrderScreen = () => {
   const orderPay = useSelector((state) => state.orderPay)
   const { loading: loadingPay, success: successPay } = orderPay
 
+  const userLogin = useSelector((state) => state.userLogin)
+  const { userInfo } = userLogin
+
   if (!loading) {
     order.itemsPrice = order.orderItems.reduce(
       (acc, item) => acc + item.price * item.qty,
@@ -32,6 +36,9 @@ const OrderScreen = () => {
   }
 
   useEffect(() => {
+    if (!userInfo) {
+      navigate('/login')
+    }
     const addPayPalScript = async () => {
       const { data: clientId } = await axios.get('/api/confing/paypal')
       const script = document.createElement('script')
@@ -53,7 +60,7 @@ const OrderScreen = () => {
         setSdkReady(true)
       }
     }
-  }, [order, dispatch, orderId, successPay])
+  }, [order, dispatch, orderId, successPay, navigate, userInfo])
 
   const successPaymentHandeler = (paymentResult) => {
     dispatch(payOrder(orderId, paymentResult))
@@ -92,7 +99,7 @@ const OrderScreen = () => {
               </p>
               {order.isDelivered ? (
                 <Message variant='success'>
-                  Delivered on {order.isDelivered}
+                  Delivered on {order.deliveredAt.substring(0, 10)}
                 </Message>
               ) : (
                 <Message variant='danger'>Not Delivered</Message>
@@ -106,7 +113,9 @@ const OrderScreen = () => {
                 {order.paymentMethod}
               </p>
               {order.isPaid ? (
-                <Message variant='success'>Paid on {order.paidAt}</Message>
+                <Message variant='success'>
+                  Paid on {order.paidAt.substring(0, 10)}
+                </Message>
               ) : (
                 <Message variant='danger'>Not Paid</Message>
               )}
@@ -177,7 +186,7 @@ const OrderScreen = () => {
                   <Col>${order.totalPrice}</Col>
                 </Row>
               </ListGroup.Item>
-              {!order.isPaid && (
+              {!order.isPaid && !userInfo.isAdmin && (
                 <ListGroup.Item>
                   {loadingPay && <Loader />}
                   {!sdkReady ? (

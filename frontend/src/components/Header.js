@@ -1,33 +1,57 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-
 import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap'
+
 import { logout } from '../actions/userActions'
 const Header = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin
 
   const logoutHandeler = () => {
     dispatch(logout())
+    navigate('/')
   }
 
   return (
     <header>
       <Navbar bg='dark' variant='dark' expand='lg' collapseOnSelect>
         <Container>
-          <Link className='nav-link' to='/'>
+          <Nav.Link id='RouterNavLink' as={Link} to='/'>
             <Navbar.Brand>ProShop</Navbar.Brand>
-          </Link>
+          </Nav.Link>
 
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
           <Navbar.Collapse id='basic-navbar-nav'>
             <Nav className='ms-auto'>
-              <Link className='nav-link' to='/cart'>
+              <Nav.Link id='RouterNavLink' as={Link} to='/cart'>
                 <i className='fas fa-shopping-cart'></i> Cart
-              </Link>
-
+              </Nav.Link>
+              {userInfo && userInfo.isAdmin && (
+                <NavDropdown title='Actions' id='adminMenu' menuVariant='dark'>
+                  <NavDropdown.Item>
+                    <Nav.Link id='RouterNavLink' as={Link} to='/admin/userlist'>
+                      Users
+                    </Nav.Link>
+                  </NavDropdown.Item>
+                  <NavDropdown.Item>
+                    <Nav.Link
+                      id='RouterNavLink'
+                      as={Link}
+                      to='admin/productlist'
+                    >
+                      Products
+                    </Nav.Link>
+                  </NavDropdown.Item>
+                  <NavDropdown.Item>
+                    <Nav.Link id='RouterNavLink' as={Link} to='admin/orderlist'>
+                      Orders
+                    </Nav.Link>
+                  </NavDropdown.Item>
+                </NavDropdown>
+              )}
               {userInfo ? (
                 <NavDropdown
                   title={userInfo.name}
@@ -35,9 +59,9 @@ const Header = () => {
                   menuVariant='dark'
                 >
                   <NavDropdown.Item>
-                    <Link className='nav-link' to='/profile'>
+                    <Nav.Link id='RouterNavLink' as={Link} to='/profile'>
                       Profile
-                    </Link>
+                    </Nav.Link>
                   </NavDropdown.Item>
 
                   <NavDropdown.Item onClick={logoutHandeler}>
@@ -45,9 +69,9 @@ const Header = () => {
                   </NavDropdown.Item>
                 </NavDropdown>
               ) : (
-                <Link className='nav-link' to='/login'>
+                <Nav.Link id='RouterNavLink' as={Link} to='/login'>
                   <i className='fas fa-user'></i>Sign In
-                </Link>
+                </Nav.Link>
               )}
             </Nav>
           </Navbar.Collapse>
